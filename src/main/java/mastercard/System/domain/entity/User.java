@@ -1,5 +1,6 @@
 package mastercard.System.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -10,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,8 +41,14 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRoles roles;
 
-    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime createdAt;
+
+    @PrePersist
+    public void time(){
+        createdAt=LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    }
 
     @Override
     public @NullMarked Collection<? extends GrantedAuthority> getAuthorities() {
